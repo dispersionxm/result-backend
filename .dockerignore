@@ -1,0 +1,31 @@
+# Исключаем node_modules, так как зависимости устанавливаются внутри контейнера
+node_modules
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# Исключаем временные файлы
+*.log
+*.cache
+*.pid
+*.gz
+*.zip
+
+# Исключаем файлы окружения (чтобы не утекли секреты)
+#.env
+#.env.local
+#.env.development
+#.env.production
+
+# Исключаем файлы, не относящиеся к коду
+.git
+.gitignore
+.idea
+.vscode
+.DS_Store
+thumbs.db
+
+# Исключаем файлы сборки (если они есть)
+dist
+build
+coverage

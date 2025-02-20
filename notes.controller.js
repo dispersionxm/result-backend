@@ -1,66 +1,36 @@
 const fs = require('fs/promises')
 const path = require('path')
 const chalk = require('chalk')
+const { Note} = require('./models/note-model')
 
-const notesPath = path.join(__dirname, 'db.json')
-
-// add
-
-async function addNote(title) {
-	// const notes = require('./db.json')
-	// const notes = Buffer.from(buffer).toString('utf-8')
-
-	const notes = await getNotes()
-
-	const note = {
-		title,
-		id: Date.now().toString()
-	}
-
-	notes.push(note)
-
-	await fs.writeFile(notesPath, JSON.stringify(notes))
-
+async function addNote(title, author) {
+	const notes = Note.create({ title, author })
 	console.log(chalk.bgBlue('Note has been successfully added!'))
 }
 
-// get
-
 async function getNotes() {
-	const notes = await fs.readFile(notesPath, { encoding: 'utf-8' })
-
-	return Array.isArray(JSON.parse(notes)) ? JSON.parse(notes) : []
+	const notes = await Note.find()
+	return notes || []
 }
 
-//update
+async function updateNote(id, title, author) {
+	const result = await Note.updateOne({ _id: id, author }, { title })
+	console.log('result', result)
+	console.log(chalk.bgBlue('Note has been successfully updated!'), result)
 
-async function updateNote(id, title) {
-	const notes = await getNotes()
-
-	const updatedNotes = notes.map(note => {
-		if (note.id === id) {
-			note.title = title
-		}
-
-		return note
-	})
-
-	await fs.writeFile(notesPath, JSON.stringify(updatedNotes))
-
-	console.log(chalk.bgBlue('Note has been successfully updated!'))
+	if (result.matchedCount === 0) {
+		throw new Error('Note not found')
+	}
 }
 
-// remove
+async function removeNote(id, author) {
+	const result = await Note.deleteOne({ _id: id, author })
 
-async function removeNote(id) {
-	const notes = await getNotes()
+	if (result.matchedCount === 0) {
+		throw new Error('Note not found')
+	}
 
-	const filteredNotes = notes.filter(note => note.id !== id)
-
-	await fs.writeFile(notesPath, JSON.stringify(filteredNotes))
-
-	console.log(chalk.bgRed('Note has been successfully removed!'))
-
+	console.log(chalk.redBright(`Note with id=${id} has been removed!`))
 }
 
 // print
